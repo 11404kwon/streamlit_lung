@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 
 # ---------------- 페이지 설정 ----------------
 st.set_page_config(
-    page_title="CYBER LUNG AI",
+    page_title="LUNG AI",
     page_icon="🧬",
     layout="wide"
 )
@@ -92,18 +92,18 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 # ---------------- 제목 ----------------
-st.markdown('<div class="main-title">CYBER LUNG AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">LUNG AI</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">환자 군집 분석 시스템</div>', unsafe_allow_html=True)
 
 # ---------------- 예시 데이터 ----------------
 df = pd.DataFrame({
-    '흡연': [1,2,3,8,9,10,4,5,6,7],
-    '음주': [1,2,1,8,9,10,5,6,7,8],
-    '나이': [20,22,25,55,60,58,35,40,45,50]
+    'Smoking': [1,2,3,8,9,10,4,5,6,7],
+    'Alcohol': [1,2,1,8,9,10,5,6,7,8],
+    'Age': [20,22,25,55,60,58,35,40,45,50]
 })
 
 # ---------------- 모델 학습 ----------------
-X = df[['흡연','음주','나이']]
+X = df[['Smoking','Alcohol','Age']]
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -121,9 +121,9 @@ with col1:
 
     st.subheader("🧬 환자 데이터 입력")
 
-    Smokes = st.number_input("흡연 수치", min_value=0.0)
-    Alkhol = st.number_input("음주 수치", min_value=0.0)
-    Age = st.number_input("나이", min_value=0.0)
+    Smokes = st.number_input("Smoking", min_value=0.0)
+    Alkhol = st.number_input("Alcohol", min_value=0.0)
+    Age = st.number_input("Age", min_value=0.0)
 
     predict_btn = st.button("AI 군집 분석 시작")
 
@@ -136,7 +136,7 @@ with col2:
 
         new_patient = pd.DataFrame(
             [[Smokes, Alkhol, Age]],
-            columns=['흡연','음주','나이']
+            columns=['Smoking','Alcohol','Age']
         )
 
         new_patient_scaled = scaler.transform(new_patient)
@@ -155,15 +155,15 @@ with col2:
         # ---------------- 그래프 ----------------
         fig = px.scatter(
             df,
-            x='흡연',
-            y='음주',
+            x='Smoking',
+            y='Alcohol',
             color=df['cluster'].astype(str),
-            size='나이',
+            size='Age',
             template='plotly_dark',
             opacity=0.75
         )
 
-        # 새 환자 추가
+        # 새 환자 표시
         fig.add_scatter(
             x=[Smokes],
             y=[Alkhol],
@@ -180,7 +180,7 @@ with col2:
             paper_bgcolor='#050816',
             plot_bgcolor='#050816',
             font=dict(color='white'),
-            title='CYBER CLUSTER MAP'
+            title='LUNG CLUSTER MAP'
         )
 
         st.plotly_chart(fig, use_container_width=True)
