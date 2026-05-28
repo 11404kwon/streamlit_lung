@@ -16,20 +16,20 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
 
 html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-    background-color: #0B1120;
-    color: white;
+    font-family: 'Pretendard', sans-serif;
+    background-color: #F1F5F9;
+    color: #0F172A;
 }
 
 /* 전체 배경 */
 .stApp {
     background: linear-gradient(
         135deg,
-        #0B1120,
-        #111827
+        #F8FAFC,
+        #E2E8F0
     );
 }
 
@@ -38,7 +38,7 @@ html, body, [class*="css"] {
     text-align: center;
     font-size: 52px;
     font-weight: 700;
-    color: #F8FAFC;
+    color: #1E3A8A;
     margin-top: 10px;
     margin-bottom: 5px;
     letter-spacing: 1px;
@@ -47,25 +47,26 @@ html, body, [class*="css"] {
 /* 서브 제목 */
 .sub-title {
     text-align: center;
-    color: #94A3B8;
+    color: #475569;
     font-size: 18px;
     margin-bottom: 40px;
 }
 
 /* 카드 */
 .card {
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid #1E293B;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #CBD5E1;
     border-radius: 22px;
     padding: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
 /* 입력창 */
 [data-testid="stNumberInput"] {
-    background-color: #111827;
+    background-color: white;
     border-radius: 14px;
     padding: 8px;
-    border: 1px solid #334155;
+    border: 1px solid #CBD5E1;
 }
 
 /* 버튼 */
@@ -90,8 +91,8 @@ html, body, [class*="css"] {
 
 /* 결과 박스 */
 .result-box {
-    background: #111827;
-    border: 1px solid #334155;
+    background: white;
+    border: 1px solid #CBD5E1;
     border-radius: 18px;
     padding: 22px;
 
@@ -100,9 +101,11 @@ html, body, [class*="css"] {
     font-size: 28px;
     font-weight: 600;
 
-    color: #F8FAFC;
+    color: #0F172A;
 
     margin-bottom: 25px;
+
+    box-shadow: 0 4px 18px rgba(0,0,0,0.05);
 }
 
 /* 소제목 */
@@ -110,7 +113,7 @@ html, body, [class*="css"] {
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 20px;
-    color: #F8FAFC;
+    color: #0F172A;
 }
 
 </style>
@@ -123,19 +126,19 @@ st.markdown(
 )
 
 st.markdown(
-    '<div class="sub-title">환자 군집 분석 시스템</div>',
+    '<div class="sub-title">폐 건강 환자 군집 분석 시스템</div>',
     unsafe_allow_html=True
 )
 
 # ---------------- 데이터 ----------------
 df = pd.DataFrame({
-    'Smoking': [1,2,3,8,9,10,4,5,6,7],
-    'Alcohol': [1,2,1,8,9,10,5,6,7,8],
-    'Age': [20,22,25,55,60,58,35,40,45,50]
+    '흡연': [1,2,3,8,9,10,4,5,6,7],
+    '음주': [1,2,1,8,9,10,5,6,7,8],
+    '나이': [20,22,25,55,60,58,35,40,45,50]
 })
 
 # ---------------- 모델 ----------------
-X = df[['Smoking', 'Alcohol', 'Age']]
+X = df[['흡연', '음주', '나이']]
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -156,11 +159,11 @@ with col1:
         unsafe_allow_html=True
     )
 
-    Smokes = st.number_input("Smoking", min_value=0.0)
-    Alkhol = st.number_input("Alcohol", min_value=0.0)
-    Age = st.number_input("Age", min_value=0.0)
+    Smokes = st.number_input("흡연 수치", min_value=0.0)
+    Alkhol = st.number_input("음주 수치", min_value=0.0)
+    Age = st.number_input("나이", min_value=0.0)
 
-    predict_btn = st.button("군집 분석")
+    predict_btn = st.button("군집 분석 시작")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -171,7 +174,7 @@ with col2:
 
         new_patient = pd.DataFrame(
             [[Smokes, Alkhol, Age]],
-            columns=['Smoking', 'Alcohol', 'Age']
+            columns=['흡연', '음주', '나이']
         )
 
         # 스케일링
@@ -184,7 +187,7 @@ with col2:
         st.markdown(
             f"""
             <div class="result-box">
-                예측 결과 : {pred_cluster[0]}번 군집
+                분석 결과 : {pred_cluster[0]}번 군집
             </div>
             """,
             unsafe_allow_html=True
@@ -193,12 +196,17 @@ with col2:
         # 그래프
         fig = px.scatter(
             df,
-            x='Smoking',
-            y='Alcohol',
+            x='흡연',
+            y='음주',
             color=df['cluster'].astype(str),
-            size='Age',
-            template='plotly_dark',
-            opacity=0.75
+            size='나이',
+            opacity=0.8,
+
+            labels={
+                '흡연': '흡연',
+                '음주': '음주',
+                'cluster': '군집'
+            }
         )
 
         # 새 환자 표시
@@ -211,23 +219,23 @@ with col2:
                 color='red',
                 symbol='x'
             ),
-            name='Patient'
+            name='새 환자'
         )
 
         # 그래프 디자인
         fig.update_layout(
-            title='Patient Cluster Map',
+            title='환자 군집 분석 그래프',
 
-            paper_bgcolor='#0B1120',
-            plot_bgcolor='#111827',
+            paper_bgcolor='#F8FAFC',
+            plot_bgcolor='white',
 
             font=dict(
-                family='Inter',
+                family='Pretendard',
                 size=15,
-                color='white'
+                color='#0F172A'
             ),
 
-            legend_title='Cluster',
+            legend_title='군집',
 
             margin=dict(
                 l=20,
